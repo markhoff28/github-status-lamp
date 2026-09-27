@@ -1,46 +1,46 @@
 # GitHub Status Lamp
 
-Eigenständige Firmware für einen **Seeed Studio XIAO ESP32C3** und einen
-**WS2812B-LED-Streifen**. Die Lampe fragt den öffentlichen GitHub-Systemstatus ab
-und zeigt ihn farbig an. Kein GitHub-Token, WLED oder eigener Server erforderlich.
+Standalone firmware for a **Seeed Studio XIAO ESP32C3** and a **WS2812B LED strip**.
+The lamp polls GitHub's public system status and displays it using colored LEDs.
+No GitHub token, WLED, or custom server is required.
 
-## Funktionen
+## Features
 
-- GitHub-Status über HTTPS mit Zertifikatsprüfung, Abfrage alle 60 Sekunden.
-- Grün, Gelb, Orange, Rot oder Blau je nach Status.
-- WLAN-Einrichtung über ein passwortgeschütztes Setup-WLAN.
-- LED-Anzahl (1–300) und Helligkeit (0–255) über die Webseite einstellbar.
-- Einstellungen bleiben nach einem Neustart erhalten.
-- Webseite im Heimnetz unter http://github-status-lamp.local.
-- Automatische Wiederverbindung; veraltete oder ungültige Statusdaten werden blau angezeigt.
+- GitHub status over HTTPS with certificate verification, polled every 60 seconds.
+- Green, yellow, orange, red, or blue depending on the status.
+- Wi-Fi provisioning through a password-protected setup access point.
+- LED count (1–300) and brightness (0–255) configurable through the web interface.
+- Settings persist across restarts.
+- Web interface on your home network at http://github-status-lamp.local.
+- Automatic reconnection; stale or invalid status data is displayed in blue.
 
 ## Hardware
 
-| Anschluss | Verbindung |
+| Connection | Wiring |
 | --- | --- |
-| XIAO D2 / GPIO4 | DIN des LED-Streifens |
-| GND | Gemeinsame Masse von XIAO, Streifen und Netzteil |
-| LED +5 V | Passendes externes 5-V-Netzteil |
+| XIAO D2 / GPIO4 | LED strip DIN |
+| GND | Common ground for the XIAO, strip, and power supply |
+| LED +5 V | Suitable external 5 V power supply |
 
-Den Streifen nicht über den 3V3-Pin versorgen. Bei USB-Versorgung des XIAO und
-separater LED-Versorgung die externe 5-V-Leitung nicht zusätzlich an den XIAO
-anschließen. Die externe WLAN-Antenne des XIAO anschließen.
+Do not power the strip from the 3V3 pin. When powering the XIAO through USB and the
+LED strip from a separate supply, do not also connect the external 5 V line to
+the XIAO. Connect the XIAO's external Wi-Fi antenna.
 
-Für eine zuverlässige Datenleitung sind ein 3,3-V-auf-5-V-Pegelwandler
-(z. B. 74AHCT125) und ein Widerstand von 330–470 Ohm zum DIN empfehlenswert.
+For a reliable data signal, a 3.3 V to 5 V level shifter (such as a 74AHCT125)
+and a 330–470 ohm resistor in the data line to DIN are recommended.
 
-Die reguläre Firmware nutzt **Adafruit NeoPixel**. Im Hardware-Vergleichstest
-funktionierte diese Ansteuerung; mit FastLED blieb der getestete Streifen weiß.
-Beide Diagnosevarianten sind zum Vergleich enthalten.
+The main firmware uses **Adafruit NeoPixel**. In a hardware comparison test,
+this driver worked, while the tested strip remained white with FastLED.
+Both diagnostic variants are included for comparison.
 
-## Lokal einrichten
+## Local setup
 
-Voraussetzung ist PlatformIO Core oder die PlatformIO-Erweiterung für VS Code.
-Das Projektverzeichnis in VS Code öffnen oder die folgenden Befehle darin ausführen.
+Install PlatformIO Core or the PlatformIO extension for VS Code.
+Open the project directory in VS Code or run the following commands from it.
 
-1. `include/secrets.example.h` nach `include/secrets.h` kopieren.
-2. Darin `LAMP_SETUP_PASSWORD` durch ein eigenes Passwort mit 8–63 ASCII-Zeichen ersetzen.
-3. Firmware bauen und über USB aufspielen:
+1. Copy `include/secrets.example.h` to `include/secrets.h`.
+2. Set `LAMP_SETUP_PASSWORD` to your own password containing 8–63 ASCII characters.
+3. Build the firmware and upload it over USB:
 
 ```sh
 pio run
@@ -49,123 +49,124 @@ pio run -t upload
 pio device monitor -b 115200
 ```
 
-Bei mehreren Geräten den Anschluss ausdrücklich angeben, beispielsweise
-`pio run -t upload --upload-port COM4` unter Windows oder
-`--upload-port /dev/ttyACM0` unter Linux.
+If multiple devices are connected, specify the port explicitly, for example
+`pio run -t upload --upload-port COM4` on Windows or
+`--upload-port /dev/ttyACM0` on Linux.
 
-`secrets.h`, lokale IDE-Dateien und Build-Ausgaben sind von Git ausgeschlossen.
-Das Setup-Passwort steckt auch in der kompilierten Firmware; lokale Binärdateien
-deshalb nicht veröffentlichen. Das öffentliche CA-Zertifikat in
-`include/github_status_ca.h` ist dagegen kein Geheimnis.
+`secrets.h`, local IDE files, and build outputs are excluded from Git.
+The setup password is also embedded in the compiled firmware, so do not publish
+your local firmware binaries. The public CA certificate in
+`include/github_status_ca.h` is not a secret.
 
-## Einrichtung der Lampe
+## Setting up the lamp
 
-1. Mit **GitHub-Status-Lamp-Setup** verbinden. Das Passwort steht in deiner lokalen
+1. Connect to **GitHub-Status-Lamp-Setup** using the password from your local
    `include/secrets.h`.
-2. **http://192.168.4.1** öffnen und unter **Configure WiFi** das eigene
-   2,4-GHz-WLAN einrichten.
-3. Unter **Setup** die LED-Anzahl und Helligkeit einstellen und **Save** drücken.
-   Die Werte werden sofort übernommen und dauerhaft gespeichert.
-4. Nach Verbindung und Zeitsynchronisierung zeigt die Lampe den GitHub-Status.
+2. Open **http://192.168.4.1** and use **Configure WiFi** to connect the lamp to
+   your 2.4 GHz Wi-Fi network.
+3. Under **Setup**, adjust the LED count and brightness, then press **Save**.
+   Settings take effect immediately and are saved persistently.
+4. Once connected and its clock is synchronized, the lamp displays GitHub's status.
 
-Im Heimnetz ist die Seite unter **http://github-status-lamp.local** oder der
-vom Router vergebenen IP erreichbar. Direkt zu den LED-Einstellungen:
-**http://github-status-lamp.local/param**. Die Auflösung von `.local` hängt vom
-Netzwerk und Client ab; bei Problemen die IP verwenden.
+On your home network, open **http://github-status-lamp.local** or use the IP address
+assigned by your router. Direct link to the LED settings:
+**http://github-status-lamp.local/param**. Resolution of `.local` names depends on
+your network and client; use the IP address if it does not work.
 
-Die LED-Anzahl bezeichnet einzelne LEDs, nicht Meter. Helligkeit 0 bedeutet aus.
-Startwerte sind 30 LEDs und Helligkeit 50 von 255. GPIO, Standardwerte,
-Zeitintervalle und Stromlimit stehen in `include/config.h`.
+LED count means individual LEDs, not strip length in meters. Brightness 0 turns
+the LEDs off. Defaults are 30 LEDs and brightness 50 out of 255. The GPIO pin,
+defaults, timing intervals, and current limit are defined in `include/config.h`.
 
-Das geschätzte Stromlimit beträgt 500 mA. Die Firmware berücksichtigt 1 mA
-Ruhestrom pro eingestellter LED und bis zu 20 mA je Farbkanal und reduziert
-gegebenenfalls die Helligkeit. Das ersetzt keine passend dimensionierte Versorgung.
+The estimated current limit is 500 mA. The firmware assumes 1 mA of idle current
+per configured LED and up to 20 mA per color channel, reducing brightness when
+necessary. This does not replace a suitably rated power supply.
 
-Das Setup-WLAN startet bei jedem Einschalten und bleibt nach dem Speichern aktiv.
-**Close** beendet das Portal; ein Neustart, drei Sekunden **BOOT** am laufenden
-Gerät oder der serielle Befehl `p` öffnen es erneut. BOOT nicht während des
-Einschaltens gedrückt halten, sonst startet der Downloadmodus.
+The setup access point starts on every boot and remains active after saving.
+**Close** shuts down the portal. Restart the device, hold **BOOT** for three
+seconds while it is running, or send the serial command `p` to reopen it.
+Do not hold BOOT during power-on, as this enters download mode.
 
-Das Hotspot-Passwort schützt den WLAN-Zugang. Die Konfigurationsseite selbst hat
-keine zusätzliche Anmeldung und ist auch im Heimnetz erreichbar. Nur in
-vertrauenswürdigen Netzen verwenden, keine Portweiterleitung ins Internet einrichten.
-WLAN-Zugangsdaten werden auf dem ESP gespeichert, nicht in Projektdateien.
+The hotspot password protects Wi-Fi access. The configuration page itself has no
+additional login and is also accessible on your home network. Use it only on
+trusted networks and do not forward its port to the internet.
+Wi-Fi credentials are stored on the ESP, not in project files.
 
-## Status und Bedienung
+## Status display and controls
 
-| Status | Anzeige | Serieller Farbtest |
+| Status | Display | Serial color test |
 | --- | --- | --- |
-| Operational / `none` | Grün, konstant | `1` |
-| `minor` | Gelb, langsam pulsierend | `2` |
-| `major` | Orange, schneller pulsierend | `3` |
-| `critical` | Rot blinkend | `4` |
-| Unknown / Start | Blau | `0` |
+| Operational / `none` | Steady green | `1` |
+| `minor` | Slowly pulsing yellow | `2` |
+| `major` | Faster pulsing orange | `3` |
+| `critical` | Blinking red | `4` |
+| Unknown / startup | Blue | `0` |
 
-Farbtests enden nach 30 Sekunden; `a` kehrt sofort zur Live-Anzeige zurück.
-`p` öffnet das Portal, `s` zeigt Netzwerk- und BOOT-Tasten-Diagnosedaten.
+Color tests end after 30 seconds; `a` immediately restores the live status display.
+`p` opens the portal, and `s` prints network and BOOT button diagnostics.
 
-HTTPS läuft in einem separaten FreeRTOS-Task. Netzwerk-, HTTP- und JSON-Fehler
-sowie unbekannte Statuswerte führen zu Unknown. Ein Ergebnis veraltet nach
-120 Sekunden. Die LED-Animation läuft mit `millis()`; eine WLAN-Einrichtung
-kann beim Speichern kurz warten.
+HTTPS requests run in a separate FreeRTOS task. Network, HTTP, and JSON errors,
+as well as unrecognized status values, result in Unknown. Results become stale
+after 120 seconds. LED animations use `millis()`; saving Wi-Fi settings may
+briefly pause the main loop.
 
-Die Zertifikatsprüfung benötigt eine per NTP synchronisierte Uhr und nutzt
-ISRG Root X1. Bei einem Wechsel der Zertifizierungsstelle muss
-`include/github_status_ca.h` aktualisiert werden. Antwortkörper sind auf
-4096 Bytes begrenzt. OTA und einzelne GitHub-Komponenten sind noch nicht implementiert.
+Certificate verification requires an NTP-synchronized clock and uses ISRG Root X1.
+If the endpoint changes its certificate authority, update
+`include/github_status_ca.h`. Response bodies are limited to 4096 bytes.
+OTA updates and individual GitHub component statuses are not implemented yet.
 
 ## Tests
 
-Unity-Tests auf dem angeschlossenen Board:
+Run the Unity tests on the connected board:
 
 ```sh
 pio test -e seeed_xiao_esp32c3
 pio run -e seeed_xiao_esp32c3 -t upload
 ```
 
-Die Tests prüfen Status-Mapping, fehlerhafte JSON-Daten, LED-Anzahl und Statusalter
-einschließlich Timerüberlauf. Sie ersetzen vorübergehend die Anwendung; anschließend
-die reguläre Firmware wieder aufspielen.
+The tests cover status mapping, invalid JSON, LED count validation, and status
+freshness, including timer rollover. They temporarily replace the application;
+upload the main firmware again afterward.
 
-Für einen Hardwaretest ohne WLAN: fünf Sekunden Aus, Rot, Grün und Blau im Wechsel,
-erste zehn LEDs mit Helligkeit 32 von 255.
+The standalone hardware test runs without Wi-Fi. It cycles through off, red,
+green, and blue, spending five seconds on each. The first ten LEDs use brightness
+32 out of 255.
 
 ```sh
-# Funktionierender Vergleichstreiber:
+# Driver confirmed working in the hardware comparison:
 pio run -e led_diagnostic_neopixel -t upload
-# Alternativer FastLED-Test:
+# Alternative FastLED test:
 pio run -e led_diagnostic -t upload
-# Reguläre Anwendung wiederherstellen:
+# Restore the main application:
 pio run -e seeed_xiao_esp32c3 -t upload
 ```
 
-Die Diagnosetests verändern gespeicherte WLAN- und LED-Einstellungen nicht.
-Hardware-Farbwechsel und Speichern von LED-Anzahl/Helligkeit wurden am
-XIAO geprüft. Ein umfassender Langzeit- und Netzwerkausfalltest steht noch aus.
+Diagnostic tests do not change stored Wi-Fi or LED settings.
+Color changes and persistence of LED count and brightness have been tested on
+the XIAO. Comprehensive long-term and network failure testing is still pending.
 
-## Als neues GitHub-Repository veröffentlichen
+## Publishing as a new GitHub repository
 
-Auf GitHub ein **leeres** Repository `github-status-lamp` anlegen, ohne zusätzliche
-README, Lizenz oder Gitignore. Danach im lokalen Projektordner:
+Create an **empty** repository named `github-status-lamp` on GitHub without adding
+a README, license, or gitignore. Then run these commands in the local project directory:
 
 ```sh
-git remote add origin https://github.com/DEIN-USERNAME/github-status-lamp.git
+git remote add origin https://github.com/YOUR-USERNAME/github-status-lamp.git
 git push -u origin main
 ```
 
-Das lokal vorbereitete Repository enthält bereits den ersten Commit.
-Vor späteren Commits mit `git status` und `git diff --cached` die Änderungen prüfen.
+The prepared local repository already contains the initial commit.
+Before future commits, review your changes with `git status` and `git diff --cached`.
 
-## Lizenz
+## License
 
-Für den eigenen Projektcode ist derzeit keine Lizenz festgelegt.
-Die verwendeten Bibliotheken und Drittmaterialien unterliegen ihren jeweiligen
-Lizenzen; sie werden nicht als Quellkopien in diesem Repository mitgeliefert.
+No license has been selected for the original project code.
+Dependencies and third-party materials remain subject to their respective licenses;
+dependency source copies are not bundled in this repository.
 
-## Referenzen
+## References
 
 - [Seeed: XIAO ESP32C3](https://wiki.seeedstudio.com/XIAO_ESP32C3_Getting_Started/)
 - [GitHub Status API](https://www.githubstatus.com/api)
 - [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
 - [WiFiManager](https://github.com/tzapu/WiFiManager)
-- [PlatformIO-Board](https://docs.platformio.org/en/stable/boards/espressif32/seeed_xiao_esp32c3.html)
+- [PlatformIO board documentation](https://docs.platformio.org/en/stable/boards/espressif32/seeed_xiao_esp32c3.html)
