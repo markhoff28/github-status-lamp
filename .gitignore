@@ -1,0 +1,23 @@
+.pio/
+.vscode/*
+!.vscode/extensions.json
+*.code-workspace
+.idea/
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+*.log
+
+# Local credentials and firmware binaries (may contain credentials)
+include/secrets.h
+.env
+.env.*
+!.env.example
+*.bin
+*.elf
+*.map
+
+# Local agent settings
+.codex/
+.agents/
